@@ -26,7 +26,7 @@
 
     <!-- Tasks Section -->
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-2xl font-bold text-white">Tasks</h3>
+      <h3 class="text-2xl font-bold text-black">Tasks</h3>
       <router-link
         :to="`/admin/projects/${project.id}/create-task`"
         class="bg-white text-black px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
@@ -111,7 +111,7 @@
             {{ task.createdBy }}
           </td>
           <td class="px-4 py-2 text-center">
-            {{ formatDate(task.createdAt) }}
+            {{ formatDate(task.createdAtUtc) }}
           </td>
 
           <td class="px-4 py-2 space-x-2 text-center">
@@ -160,7 +160,7 @@ const project = ref({
   id: projectId,
   title: "",
   description: "",
-  createdAt: "",
+  createdAtUtc: "",
 });
 const users = ref([]);
 const tasks = ref([]);
@@ -212,7 +212,7 @@ const filteredTasks = computed(() => {
       !filters.value.assignedTo || t.assignedToId === filters.value.assignedTo;
     const mDate =
       !filters.value.createdFrom ||
-      new Date(t.createdAt) >= new Date(filters.value.createdFrom);
+      new Date(t.createdAtUtc) >= new Date(filters.value.createdFrom);
     return mTitle && mStatus && mUser && mDate;
   });
 });

@@ -56,7 +56,9 @@
         >
           <td class="px-4 py-2 text-center">{{ project.title }}</td>
           <td class="px-4 py-2 text-center">{{ project.createdBy }}</td>
-          <td class="px-4 py-2 text-center">{{ project.createdAt }}</td>
+          <td class="px-4 py-2 text-center">
+            {{ formatDate(project.createdAtUtc) }}
+          </td>
           <td class="px-4 py-2 space-x-2 text-center">
             <button
               @click="viewTasks(project.id)"
@@ -109,10 +111,7 @@ const fetchProjects = async () => {
     const res = await api.get("/api/projects", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
-    projects.value = res.data.map((p) => ({
-      ...p,
-      createdAt: new Date(`${p.createdAt}Z`).toLocaleString(),
-    }));
+    projects.value = res.data;
   } catch (err) {
     console.error("Failed to load projects", err);
   }
@@ -133,10 +132,11 @@ const filteredProjects = computed(() => {
       !filters.value.createdBy || p.createdBy === filters.value.createdBy;
     const fromOk =
       !filters.value.createdFrom ||
-      new Date(p.createdAt) >= new Date(filters.value.createdFrom);
+      new Date(p.createdAtUtc) >= new Date(filters.value.createdFrom);
     const toOk =
       !filters.value.createdTo ||
-      new Date(p.createdAt) <= new Date(filters.value.createdTo + "T23:59:59");
+      new Date(p.createdAtUtc) <=
+        new Date(filters.value.createdTo + "T23:59:59");
     return matchesName && matchesCreator && fromOk && toOk;
   });
 });
@@ -151,6 +151,12 @@ const deleteProject = async (id) => {
   toast.success("Project deleted successfully!");
   fetchProjects();
 };
+
+const formatDate = (dt) =>
+  new Date(`${dt}Z`).toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 
 onMounted(fetchProjects);
 </script>
